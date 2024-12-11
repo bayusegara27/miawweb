@@ -1,33 +1,20 @@
 from flask import Flask, request, render_template, redirect, url_for, session
 from expert_system import ExpertSystem
 import bcrypt
-import pyodbc
 from flask_mysqldb import MySQL
-
 
 app = Flask(__name__)
 system = ExpertSystem()
 
-# Konfigurasi SQL Server Azure
-app.config['SQL_SERVER'] = 'sql12.freemysqlhosting.net'  # Ganti dengan nama server Azure
-app.config['SQL_DATABASE'] = 'sql12751318'  # Ganti dengan nama database
-app.config['SQL_USERNAME'] = 'sql12751318'  # Ganti dengan username Azure
-app.config['SQL_PASSWORD'] = 'Pbp9b7DqvN'  # Ganti dengan password
-app.config['SQL_DRIVER'] = '{ODBC Driver 18 for SQL Server}'
-
+# Konfigurasi MySQL
+app.config['MYSQL_HOST'] = 'sql12.freemysqlhosting.net'  # Ganti dengan nama host MySQL
+app.config['MYSQL_USER'] = 'sql12751318'  # Ganti dengan username MySQL
+app.config['MYSQL_PASSWORD'] = 'Pbp9b7DqvN'  # Ganti dengan password MySQL
+app.config['MYSQL_DB'] = 'sql12751318'  # Ganti dengan nama database MySQL
 app.secret_key = 'secretkey'
 
-# Membuat koneksi ke SQL Server
-def get_db_connection():
-    conn_str = (
-        f"DRIVER={app.config['SQL_DRIVER']};"
-        f"SERVER={app.config['SQL_SERVER']};"
-        f"DATABASE={app.config['SQL_DATABASE']};"
-        f"UID={app.config['SQL_USERNAME']};"
-        f"PWD={app.config['SQL_PASSWORD']};"
-    )
-    connection = pyodbc.connect(conn_str)
-    return connection
+# Inisialisasi MySQL
+mysql = MySQL(app)
 
 @app.route('/')
 def index():
@@ -35,16 +22,15 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    cur = mysql.connection.cursor()
     if request.method == 'POST':
         # Ambil data dari form login
         email = request.form['email']
         password = request.form['password']
         
         # Query database untuk memeriksa pengguna berdasarkan email
-        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
-        user = cursor.fetchone()  # Ambil satu hasil pencarian
+        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cur.fetchone()  # Ambil satu hasil pencarian
         
         if user:
             # Verifikasi password dengan hash yang ada di database
@@ -86,13 +72,11 @@ def register():
 
         try:
             # Menyisipkan data ke database
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            query = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
-            cursor.execute(query, (name, email, hashed_password))
-            conn.commit()  # Simpan perubahan ke database
-            cursor.close()
-            conn.close()
+            cur = mysql.connection.cursor()
+            query = "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)"
+            cur.execute(query, (name, email, hashed_password))
+            mysql.connection.commit()  # Simpan perubahan ke database
+            cur.close()
 
             # Redirect setelah berhasil registrasi
             return redirect(url_for('login'))  # Ganti 'login' dengan nama route login Anda
@@ -170,10 +154,9 @@ def akun():
     user_id = session['user_id']  # Ambil ID pengguna dari session
 
     # Query database untuk mengambil nama dan type akun
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT name, type FROM users WHERE id = ?", (user_id,))
-    user = cursor.fetchone()  # Ambil hasil query
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT name, type FROM users WHERE id = %s", (user_id,))
+    user = cur.fetchone()  # Ambil hasil query
 
     if not user:
         return "User not found", 404
@@ -195,8 +178,7 @@ def admin():
     if 'user_id' not in session or session.get('type') != 3:  
         return "Access Denied", 403  # Jika bukan admin, akses ditolak
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    cur = mysql.connection.cursor()
 
     # Jika ada perubahan type yang dilakukan admin
     if request.method == 'POST':
@@ -204,12 +186,12 @@ def admin():
         new_type = request.form.get('type')
 
         # Update type akun di database
-        cursor.execute("UPDATE users SET type = ? WHERE id = ?", (new_type, user_id))
-        conn.commit()
+        cur.execute("UPDATE users SET type = %s WHERE id = %s", (new_type, user_id))
+        mysql.connection.commit()
 
     # Ambil semua akun dari database
-    cursor.execute("SELECT id, name, email, type FROM users")
-    users = cursor.fetchall()
+    cur.execute("SELECT id, name, email, type FROM users")
+    users = cur.fetchall()
 
     # Kirim data pengguna ke template
     return render_template('admin.html', users=users)
