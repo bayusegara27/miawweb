@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/static/css/globals.css" />
+    <link rel="stylesheet" href="/static/css/styleguide.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Parkinsans:wght@300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="login">
+      <div class="overlap-wrapper">
+        <div class="overlap">
+          <div class="group">
+            <img class="image" src="/static/img/image-7.png" />
+            <div class="rectangle"></div>
+          </div>
+          <div class="div">Masuk ke Meowly</div>
+          <form action="/login" method="POST">
+            <div class="text-wrapper-2">Email atau nomor telepon</div>
+            <div class="input-chip">
+              <input type="text" class="input-field" name="email" placeholder="Masukkan email atau nomor telepon" />
+            </div>
+            
+            <div class="text-wrapper-3">Password</div>
+            <div class="input-chip-2">
+              <input type="password" class="input-field" name="password" placeholder="Masukkan password" />
+            </div>
+          
+            <div class="text-wrapper-4">atau</div>
+            <div class="text-wrapper-6">Lupa password?</div>
+          
+            <button class="button" type="submit">Masuk</button>
+          </form>
+          
+          <div class="text-wrapper-5">Belum mempunyai akun?</div>
+          <a href="/register" class="button-3">Daftar disini</a>
+          <div class="overlap-group-wrapper">
+            <div class="overlap-group">
+              <button class="button-5">
+                <button class="button-6">&nbsp;&nbsp;&nbsp;&nbsp;Masuk dengan Google</button>
+              </button>
+              <img class="img" src="/static/img/image-8.png" />
+            </div>
+          </div>
+          <img class="line" src="/static/img/line-1.svg" />
+          <img class="line-2" src="/static/img/line-2.svg" />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

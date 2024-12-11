@@ -1,0 +1,11 @@
+:root {
+    --m3syslightoutline-variant: rgba(202, 196, 208, 1);
+    --m3syslighton-surface-variant: rgba(73, 69, 79, 1);
+    --m3-label-large-font-family: "Roboto", Helvetica;
+    --m3-label-large-font-weight: 500;
+    --m3-label-large-font-size: 14px;
+    --m3-label-large-letter-spacing: 0.10000000149011612px;
+    --m3-label-large-line-height: 20px;
+    --m3-label-large-font-style: normal;
+    --button-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  }

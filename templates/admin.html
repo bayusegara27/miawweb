@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-family: "Montserrat";
+            color: #2c6cb1;
+        }
+
+        .top-bar button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .top-bar button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .td-t {
+            font-family: "Montserrat";
+        }
+
+        th {
+            background-color: #f4f4f4;
+            font-family: "Montserrat";
+            color: #114f91;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h1>Admin Panel</h1>
+        <a href="/home-admin">Beranda</a>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Sisa Waktu Premium</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td class="td-t">{{ user[0] }}</td>
+                <td class="td-t">{{ user[1] }}</td>
+                <td class="td-t">{{ user[2] }}</td>
+                <td class="td-t">
+                    {{ 'Free' if user[3] == 1 else 'Premium' if user[3] == 2 else 'Admin' }}
+                </td>
+                <td class="td-t">
+                    <span class="countdown" data-type="{{ user[3] }}" data-start="2024-12-01"></span>
+                </td>
+                <td>
+                    {% if user[3] != 3 %} 
+                    <form action="{{ url_for('admin') }}" method="POST" style="display: inline-block;">
+                        <input type="hidden" name="user_id" value="{{ user[0] }}">
+                        <input type="hidden" name="type" value="{{ 1 if user[3] == 2 else 2 }}">
+                        <button type="submit">
+                            Change to {{ 'Free' if user[3] == 2 else 'Premium' }}
+                        </button>
+                    </form>
+                    {% else %}
+                    <span>-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // Fungsi untuk menghitung mundur
+        function calculateCountdown() {
+            const countdownElements = document.querySelectorAll('.countdown');
+            countdownElements.forEach(element => {
+                const userType = element.getAttribute('data-type');
+                const startDate = new Date(element.getAttribute('data-start')); // Tanggal simulasi awal Premium
+                const now = new Date();
+                
+                if (userType == 2) {
+                    const diffTime = startDate.getTime() + (30 * 24 * 60 * 60 * 1000) - now.getTime();
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 15));
+                    if (diffDays > 0) {
+                        element.textContent = `${diffDays} days remaining`;
+                    } else {
+                        element.textContent = "Expired";
+                    }
+                } else {
+                    element.textContent = "-";
+                }
+            });
+        }
+
+        // Jalankan fungsi saat halaman selesai dimuat
+        document.addEventListener('DOMContentLoaded', calculateCountdown);
+    </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/static/css/globals.css" />
+    <link rel="stylesheet" href="/static/css/styleguide.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Parkinsans:wght@300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="register">
+      <div class="overlap-wrapper">
+        <div class="overlap">
+          <div class="group">
+            <div class="rectangle"></div>
+            <div class="group-wrapper">
+              <div class="overlap-group-wrapper">
+                <div class="overlap-group">
+                  <img class="image" src="/static/img/image-9.png" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="div">Daftar ke Meowly</div>
+          <form action="/register" method="POST">
+            <div class="text-wrapper-2">Email atau nomor telepon</div>
+            <div class="input-chip">
+              <input type="text" class="input-field" name="email" placeholder="Masukkan email atau nomor telepon" />
+            </div>
+            <div class="text-wrapper-3">Nama</div>
+            <div class="input-chip-2">
+              <input type="text" class="input-field" name="name" placeholder="Masukkan nama" />
+            </div>
+            <div class="text-wrapper-4">Password</div>
+            <div class="input-chip-3">
+              <input type="password" class="input-field" name="password" placeholder="Masukkan password" />
+            </div>
+            <div class="text-wrapper-6">Ulangi Password</div>
+            <div class="input-chip-4">
+              <input type="password" class="input-field" name="password_repeat" placeholder="Ulangi password" />
+            </div>
+            <button class="button" type="submit">Daftar</button>
+          </form>
+          
+          
+          <div class="text-wrapper-5">Sudah mempunyai akun?</div>
+          <a href="/login" class="button-3">Login disini</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
