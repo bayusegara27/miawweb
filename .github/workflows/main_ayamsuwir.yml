@@ -20,11 +20,8 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-      
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
       - name: Upload artifact for deployment jobs
@@ -34,6 +31,7 @@ jobs:
           path: |
             release.zip
             !venv/
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -41,7 +39,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write  # This is required for requesting the JWT
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -56,6 +54,15 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B4343874690843F695CA05E742012159 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B5A9A586E0B745DF9213181335A6E13A }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_CA3E3833268C41B7BBAEF7F0305E0AE9 }}
+      
+      - name: Set environment variables in Azure
+        run: |
+          echo "MYSQL_HOST=${{ secrets.MYSQL_HOST }}" >> $GITHUB_ENV
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> $GITHUB_ENV
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_ENV
+          echo "MYSQL_DB=${{ secrets.MYSQL_DB }}" >> $GITHUB_ENV
+          echo "FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }}" >> $GITHUB_ENV
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
