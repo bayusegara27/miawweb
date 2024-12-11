@@ -7,20 +7,19 @@ from flask_mysqldb import MySQL
 app = Flask(__name__)
 system = ExpertSystem()
 
-# Get database configuration from environment variables
+# Get environment variables from GitHub Secrets
 db_config = {
-    'MYSQL_HOST': os.getenv('MYSQL_HOST', 'default_host'),  # Default value can be used for local dev
-    'MYSQL_PORT': int(os.getenv('MYSQL_PORT', 3306)),
-    'MYSQL_USER': os.getenv('MYSQL_USER', 'default_user'),
-    'MYSQL_PASSWORD': os.getenv('MYSQL_PASSWORD', 'default_password'),
-    'MYSQL_DB': os.getenv('MYSQL_DB', 'default_db')
+    'MYSQL_HOST': os.getenv('MYSQL_HOST'),
+    'MYSQL_PORT': int(os.getenv('MYSQL_PORT', 3306)),  # Default to 3306 if not set
+    'MYSQL_USER': os.getenv('MYSQL_USER'),
+    'MYSQL_PASSWORD': os.getenv('MYSQL_PASSWORD'),
+    'MYSQL_DB': os.getenv('MYSQL_DB')
 }
 
 app.config.update(db_config)
 mysql = MySQL(app)
 
-# Set the secret key from environment variable for session management
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'secretkey')
 
 @app.route('/')
 def index():
