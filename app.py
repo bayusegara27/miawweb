@@ -9,10 +9,10 @@ app = Flask(__name__)
 system = ExpertSystem()
 
 # Konfigurasi SQL Server Azure
-app.config['SQL_SERVER'] = 'meowly.database.windows.net'  # Ganti dengan nama server Azure
-app.config['SQL_DATABASE'] = 'db_meowly'  # Ganti dengan nama database
-app.config['SQL_USERNAME'] = 'adminmeowly'  # Ganti dengan username Azure
-app.config['SQL_PASSWORD'] = 'Kucing123'  # Ganti dengan password
+app.config['SQL_SERVER'] = 'sql12.freemysqlhosting.net'  # Ganti dengan nama server Azure
+app.config['SQL_DATABASE'] = 'sql12751318'  # Ganti dengan nama database
+app.config['SQL_USERNAME'] = 'sql12751318'  # Ganti dengan username Azure
+app.config['SQL_PASSWORD'] = 'Pbp9b7DqvN'  # Ganti dengan password
 app.config['SQL_DRIVER'] = '{ODBC Driver 18 for SQL Server}'
 
 app.secret_key = 'secretkey'
