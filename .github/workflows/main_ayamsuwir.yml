@@ -2,10 +2,6 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
 name: Build and deploy Python app to Azure Web App - ayamsuwir
 
 on:
@@ -73,10 +69,10 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B5A9A586E0B745DF9213181335A6E13A }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_CA3E3833268C41B7BBAEF7F0305E0AE9 }}
 
-      # Set environment variables in the Azure App Service from GitHub secrets
+      # Set environment variables in Azure, using the resource group secret
       - name: Set environment variables in Azure
         run: |
-          az webapp config appsettings set --name ayamsuwir --resource-group ${AZURE_RESOURCE_GROUP} --settings \
+          az webapp config appsettings set --name ayamsuwir --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --settings \
             MYSQL_HOST=${{ secrets.MYSQL_HOST }} \
             MYSQL_PORT=${{ secrets.MYSQL_PORT }} \
             MYSQL_USER=${{ secrets.MYSQL_USER }} \
@@ -90,5 +86,3 @@ jobs:
         with:
           app-name: 'ayamsuwir'
           slot-name: 'Production'
-
-          
