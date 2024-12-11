@@ -2,6 +2,10 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+
 name: Build and deploy Python app to Azure Web App - ayamsuwir
 
 on:
@@ -50,7 +54,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write # This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -61,7 +65,7 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
+      # Log in to Azure using GitHub secrets
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -69,10 +73,22 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B5A9A586E0B745DF9213181335A6E13A }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_CA3E3833268C41B7BBAEF7F0305E0AE9 }}
 
+      # Set environment variables in the Azure App Service from GitHub secrets
+      - name: Set environment variables in Azure
+        run: |
+          az webapp config appsettings set --name ayamsuwir --resource-group ${AZURE_RESOURCE_GROUP} --settings \
+            MYSQL_HOST=${{ secrets.MYSQL_HOST }} \
+            MYSQL_PORT=${{ secrets.MYSQL_PORT }} \
+            MYSQL_USER=${{ secrets.MYSQL_USER }} \
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
+            MYSQL_DB=${{ secrets.MYSQL_DB }} \
+            FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }}
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'ayamsuwir'
           slot-name: 'Production'
+
           
