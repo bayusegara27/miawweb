@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, render_template, redirect, url_for, session
 from expert_system import ExpertSystem
 import bcrypt
@@ -6,19 +7,20 @@ from flask_mysqldb import MySQL
 app = Flask(__name__)
 system = ExpertSystem()
 
-# Konfigurasi MySQL
+# Get database configuration from environment variables
 db_config = {
-    'MYSQL_HOST': 'dns.nakumi.my.id',
-    'MYSQL_PORT': 3306,
-    'MYSQL_USER': 'root',
-    'MYSQL_PASSWORD': '123',
-    'MYSQL_DB': 'db_meowly'
+    'MYSQL_HOST': os.getenv('MYSQL_HOST', 'default_host'),  # Default value can be used for local dev
+    'MYSQL_PORT': int(os.getenv('MYSQL_PORT', 3306)),
+    'MYSQL_USER': os.getenv('MYSQL_USER', 'default_user'),
+    'MYSQL_PASSWORD': os.getenv('MYSQL_PASSWORD', 'default_password'),
+    'MYSQL_DB': os.getenv('MYSQL_DB', 'default_db')
 }
 
 app.config.update(db_config)
 mysql = MySQL(app)
 
-app.secret_key = 'secretkey'
+# Set the secret key from environment variable for session management
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
 
 @app.route('/')
 def index():
