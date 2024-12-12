@@ -32,7 +32,8 @@ google = oauth.register(
     api_base_url='https://www.googleapis.com/oauth2/v2/',
     client_kwargs={
         'scope': 'openid email profile'
-    }
+    },
+    jwks_uri='https://www.googleapis.com/oauth2/v3/certs'
 )
 
 @app.route('/')
