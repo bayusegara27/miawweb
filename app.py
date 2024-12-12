@@ -3,6 +3,7 @@ from flask import Flask, request, render_template, redirect, url_for, session
 from expert_system import ExpertSystem
 import bcrypt
 from flask_mysqldb import MySQL
+from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
 system = ExpertSystem()
@@ -18,8 +19,21 @@ db_config = {
 
 app.config.update(db_config)
 mysql = MySQL(app)
-
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'secretkey')
+
+# OAuth configuration
+oauth = OAuth(app)
+google = oauth.register(
+    name='google',
+    client_id=os.getenv('GOOGLE_CLIENT_ID'),
+    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    api_base_url='https://www.googleapis.com/oauth2/v2/',
+    client_kwargs={
+        'scope': 'openid email profile'
+    }
+)
 
 @app.route('/')
 def index():
@@ -53,6 +67,40 @@ def login():
             return "Email tidak ditemukan", 400
 
     return render_template('login.html')
+
+@app.route('/login/google')
+def login_google():
+    redirect_uri = url_for('google_callback', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/login/callback')
+def google_callback():
+    token = google.authorize_access_token()
+    user_info = google.get('userinfo').json()
+
+    # Check if user exists in database
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users WHERE email = %s", (user_info['email'],))
+    user = cursor.fetchone()
+
+    if not user:
+        # Register the user if not exists
+        cursor.execute(
+            "INSERT INTO users (name, email, password, type) VALUES (%s, %s, %s, %s)",
+            (user_info['name'], user_info['email'], '', 1)  # Default type = 1 (Free)
+        )
+        mysql.connection.commit()
+        cursor.execute("SELECT * FROM users WHERE email = %s", (user_info['email'],))
+        user = cursor.fetchone()
+
+    cursor.close()
+
+    # Log the user in
+    session['user_id'] = user[0]
+    session['email'] = user[2]
+    session['type'] = user[4]
+
+    return redirect('/home')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
