@@ -916,7 +916,6 @@
   }
   
   .login .button-5 {
-    all: unset;
     box-sizing: border-box;
     display: flex;
     width: 437px;
@@ -936,7 +935,6 @@
   }
   
   .login .button-6 {
-    all: unset;
     box-sizing: border-box;
     position: relative;
     width: fit-content;
