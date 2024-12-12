@@ -935,7 +935,6 @@
 }
 
 .login .button-6 {
-  all: unset;
   box-sizing: border-box;
   position: relative;
   width: fit-content;
@@ -947,8 +946,6 @@
   letter-spacing: 1px;
   line-height: 52px;
   white-space: nowrap;
-  top: 8px;
-  left: 80px;
 }
 
 .login .img {
