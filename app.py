@@ -1,13 +1,38 @@
 import os
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 from expert_system import ExpertSystem
 import bcrypt
 from flask_mysqldb import MySQL
+from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
 system = ExpertSystem()
 
-# Get environment variables from GitHub Secrets
+oauth = OAuth(app)
+
+# Konfigurasi Google OAuth
+app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
+app.config['GOOGLE_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'secretkey')
+app.config['GOOGLE_DISCOVERY_URL'] = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)
+
+# Inisialisasi OAuth untuk Google
+google = oauth.register(
+    name='google',
+    client_id=app.config['GOOGLE_CLIENT_ID'],
+    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    access_token_params=None,
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    authorize_params=None,
+    api_base_url='https://www.googleapis.com/oauth2/v1/',
+    userinfo_endpoint='https://www.googleapis.com/oauth2/v1/userinfo',
+    client_kwargs={'scope': 'openid email profile'},
+)
+
+# Database config
 db_config = {
     'MYSQL_HOST': os.getenv('MYSQL_HOST'),
     'MYSQL_PORT': int(os.getenv('MYSQL_PORT', 3306)),  # Default to 3306 if not set
@@ -15,11 +40,8 @@ db_config = {
     'MYSQL_PASSWORD': os.getenv('MYSQL_PASSWORD'),
     'MYSQL_DB': os.getenv('MYSQL_DB')
 }
-
 app.config.update(db_config)
 mysql = MySQL(app)
-
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'secretkey')
 
 @app.route('/')
 def index():
@@ -53,6 +75,42 @@ def login():
             return "Email tidak ditemukan", 400
 
     return render_template('login.html')
+
+@app.route('/login/google')
+def login_with_google():
+    redirect_uri = url_for('authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/authorize')
+def authorize():
+    token = google.authorize_access_token()
+    user_info = google.get('userinfo').json()
+    if user_info:
+        email = user_info['email']
+        name = user_info['name']
+
+        # Periksa apakah pengguna sudah ada di database
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            # Tambahkan pengguna baru jika belum ada
+            cursor.execute(
+                "INSERT INTO users (name, email, password, type) VALUES (%s, %s, %s, %s)",
+                (name, email, '', 1)  # Default ke pengguna "Free"
+            )
+            mysql.connection.commit()
+
+        cursor.close()
+
+        # Set session
+        session['user_id'] = user[0] if user else cursor.lastrowid
+        session['email'] = email
+        session['type'] = user[4] if user else 1
+
+        return redirect('/home')
+    return redirect('/login')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
