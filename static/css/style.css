@@ -829,7 +829,6 @@
   }
   
   .login .button {
-    all: unset;
     box-sizing: border-box;
     display: flex;
     width: 183px;
