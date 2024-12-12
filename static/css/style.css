@@ -829,6 +829,7 @@
   }
   
   .login .button {
+    all: unset;
     box-sizing: border-box;
     display: flex;
     width: 183px;
@@ -916,6 +917,7 @@
   }
   
   .login .button-5 {
+    all: unset;
     box-sizing: border-box;
     display: flex;
     width: 437px;
@@ -935,6 +937,7 @@
   }
   
   .login .button-6 {
+    all: unset;
     box-sizing: border-box;
     position: relative;
     width: fit-content;
@@ -2712,11 +2715,3 @@
   line-height: 30px;
   color: #00065c;
 }
-
-
-
-
-
-
-
-  
