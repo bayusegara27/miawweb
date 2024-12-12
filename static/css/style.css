@@ -542,43 +542,31 @@
     border-radius: 52px;
   }
   
-  .index .button-5 {
-    box-sizing: border-box;
-    display: flex;
-    width: 328px;
-    height: 112px;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-family: "Inter";
-    padding: 12px;
-    position: absolute;
-    font-weight: 500;
-    color: #2e339e;
-    font-size: 26px;
-    text-align: center;
-    top: 2199px;
-    left: 502px;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 5px solid;
-    border-color: #2e339e;
-  }
+    .login .button-5 {
+      box-sizing: border-box;
+      display: flex;
+      width: 437px;
+      height: 61px;
+      align-items: center;
+      justify-content: flex-start; /* Logo Google berada di sisi kiri */
+      gap: 8px;
+      padding: 0 12px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid;
+      border-color: #726e6e;
+      text-decoration: none; /* Menghapus garis bawah pada <a> */
+    }
   
-  .index .button-6 {
-    all: unset;
-    box-sizing: border-box;
-    position: relative;
-    width: fit-content;
-    font-family: "Roboto-Regular", Helvetica;
-    font-weight: 400;
-    color: #2e339e;
-    font-size: 24px;
-    text-align: center;
-    letter-spacing: 1.00px;
-    line-height: 30px;
-    white-space: nowrap;
-  }
+    .login .button-6 {
+      font-family: "Montserrat";
+      font-weight: 600;
+      color: #1e1e1e;
+      font-size: 20px;
+      text-align: center;
+      margin-left: 10px; /* Jarak teks dari logo */
+    }
   
   .index .text-wrapper-10 {
     position: absolute;
