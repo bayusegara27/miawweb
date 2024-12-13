@@ -72,7 +72,7 @@ def login():
 
 @app.route('/login/google')
 def login_google():
-    redirect_uri = url_for('google_callback', _external=True)
+    redirect_uri = 'https://ayamsuwir.azurewebsites.net/login/google/callback'
     return google.authorize_redirect(redirect_uri)
 
 @app.route('/login/google/callback')
