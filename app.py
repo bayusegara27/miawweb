@@ -176,14 +176,20 @@ def render_diagnosis(system, user_symptoms):
 
 @app.route("/free")
 def free():
+    if 'type' not in session or session['type'] not in [1, 3]:
+        return redirect('/home')
     return render_template("free.html")
 
 @app.route("/prem")
 def prem():
+    if 'type' not in session or session['type'] not in [2, 3]:  # 2 = Premium, 3 = Admin
+        return redirect('/free')  # Arahkan ke halaman free jika bukan premium atau admin
     return render_template("prem.html")
 
 @app.route("/home-admin")
 def homeadmin():
+    if 'type' not in session or session['type'] not in [3]:
+        return redirect('/home')
     return render_template("home-admin.html")
 
 @app.route('/akun')
