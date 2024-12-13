@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, session
 from expert_system import ExpertSystem
 import bcrypt
-from flask_mysqldb import MySQL
+import mysql.connector
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
@@ -17,8 +17,16 @@ db_config = {
     'MYSQL_DB': os.getenv('MYSQL_DB')
 }
 
-app.config.update(db_config)
-mysql = MySQL(app)
+# Function to get a database connection using mysql-connector-python
+def get_db_connection():
+    return mysql.connector.connect(
+        host=db_config['MYSQL_HOST'],
+        port=db_config['MYSQL_PORT'],
+        user=db_config['MYSQL_USER'],
+        password=db_config['MYSQL_PASSWORD'],
+        database=db_config['MYSQL_DB']
+    )
+
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'secretkey')
 
 # OAuth configuration
@@ -29,12 +37,11 @@ google = oauth.register(
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
     access_token_url='https://accounts.google.com/o/oauth2/token',
     authorize_url='https://accounts.google.com/o/oauth2/auth',
-    api_base_url='https://www.googleapis.com/oauth2/v3/',
+    api_base_url='https://www.googleapis.com/oauth2/v2/',
     client_kwargs={
         'scope': 'openid email profile'
     },
     jwks_uri='https://www.googleapis.com/oauth2/v3/certs',
-    redirect_uri='https://ayamsuwir.azurewebsites.net/login/google/callback'
 )
 
 @app.route('/')
@@ -47,13 +54,15 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        cursor = mysql.connection.cursor()
+        connection = get_db_connection()
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
         cursor.close()
+        connection.close()
 
         if user:
-            stored_password = user[3]  # Index 3 adalah kolom password
+            stored_password = user[3]  # Index 3 is the password column
             if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
                 session['user_id'] = user[0]
                 session['email'] = user[2]
@@ -64,9 +73,9 @@ def login():
                 else:
                     return redirect('/home')
             else:
-                return "Password salah", 400
+                return "Password incorrect", 400
         else:
-            return "Email tidak ditemukan", 400
+            return "Email not found", 400
 
     return render_template('login.html')
 
@@ -81,7 +90,8 @@ def google_callback():
     user_info = google.get('userinfo').json()
 
     # Check if user exists in database
-    cursor = mysql.connection.cursor()
+    connection = get_db_connection()
+    cursor = connection.cursor()
     cursor.execute("SELECT * FROM users WHERE email = %s", (user_info['email'],))
     user = cursor.fetchone()
 
@@ -91,11 +101,12 @@ def google_callback():
             "INSERT INTO users (name, email, password, type) VALUES (%s, %s, %s, %s)",
             (user_info['name'], user_info['email'], '', 1)  # Default type = 1 (Free)
         )
-        mysql.connection.commit()
+        connection.commit()
         cursor.execute("SELECT * FROM users WHERE email = %s", (user_info['email'],))
         user = cursor.fetchone()
 
     cursor.close()
+    connection.close()
 
     # Log the user in
     session['user_id'] = user[0]
@@ -113,20 +124,22 @@ def register():
         password_repeat = request.form['password_repeat']
 
         if password != password_repeat:
-            return "Password tidak cocok, silakan coba lagi.", 400
+            return "Password does not match, please try again.", 400
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         try:
-            cursor = mysql.connection.cursor()
+            connection = get_db_connection()
+            cursor = connection.cursor()
             cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
                            (name, email, hashed_password))
-            mysql.connection.commit()
+            connection.commit()
             cursor.close()
+            connection.close()
 
             return redirect(url_for('login'))
         except Exception as e:
-            return f"Terjadi kesalahan: {e}", 500
+            return f"An error occurred: {e}", 500
 
     return render_template('register.html')
 
@@ -245,18 +258,20 @@ def admin():
     if 'user_id' not in session or session.get('type') != 3:
         return "Access Denied", 403
 
-    cursor = mysql.connection.cursor()
+    connection = get_db_connection()
+    cursor = connection.cursor()
 
     if request.method == 'POST':
         user_id = request.form.get('user_id')
         new_type = request.form.get('type')
 
         cursor.execute("UPDATE users SET type = %s WHERE id = %s", (new_type, user_id))
-        mysql.connection.commit()
+        connection.commit()
 
     cursor.execute("SELECT id, name, email, type FROM users")
     users = cursor.fetchall()
     cursor.close()
+    connection.close()
 
     return render_template('admin.html', users=users)
 
