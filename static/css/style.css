@@ -479,6 +479,59 @@
   box-shadow: var(--button-shadow);
 }
 
+/* Styling form set password */
+.set-password-form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 20px auto;
+  font-family: "Montserrat";
+  font-weight: 600;
+}
+
+.set-password-form label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.set-password-form input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.set-password-form input[type="password"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.set-password-form button {
+  font-family: "Montserrat";
+  font-weight: 600;
+  background-color: #5692ca;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.set-password-form button:hover {
+  font-family: "Montserrat";
+  background-color: #0056b3;
+}
+
 .index .akunanda {
   position: relative;
   width: fit-content;
