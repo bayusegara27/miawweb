@@ -193,18 +193,41 @@ def akun():
 
     user_id = session['user_id']
 
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT name, type FROM users WHERE id = %s", (user_id,))
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT name, type, password FROM users WHERE id = %s", (user_id,))
     user = cursor.fetchone()
     cursor.close()
+    connection.close()
 
     if not user:
         return "User not found", 404
 
     name = user[0]
     user_type = "Free" if user[1] == 1 else "Premium"
+    has_password = True if user[2] else False  # Check if password is set
 
-    return render_template('akun.html', name=name, user_type=user_type)
+    return render_template('akun.html', name=name, user_type=user_type, has_password=has_password)
+
+@app.route('/set_password', methods=['POST'])
+def set_password():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    password = request.form['password']
+
+    # Hash the password before saving it
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE users SET password = %s WHERE id = %s", (hashed_password, user_id))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+    return redirect(url_for('akun'))
 
 @app.route('/logout', methods=['POST'])
 def logout():
