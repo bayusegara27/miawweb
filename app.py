@@ -41,7 +41,7 @@ google = oauth.register(
     client_kwargs={
         'scope': 'openid email profile'
     },
-    jwks_uri='https://www.googleapis.com/oauth2/v3/certs',
+    jwks_uri='https://www.googleapis.com/oauth2/v3/certs'
 )
 
 @app.route('/')
@@ -81,7 +81,7 @@ def login():
 
 @app.route('/login/google')
 def login_google():
-    redirect_uri = 'https://ayamsuwir.azurewebsites.net/login/google/callback'
+    redirect_uri = 'http://127.0.0.1:5000/login/google/callback'
     return google.authorize_redirect(redirect_uri)
 
 @app.route('/login/google/callback')
